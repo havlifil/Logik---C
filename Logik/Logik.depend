@@ -1,0 +1,18 @@
+# depslib dependency file v1.0
+1682020078 source:c:\users\filip\documents\github\logik---c\logik\main.c
+	<stdio.h>
+	<stdlib.h>
+	"constants.h"
+	"logik.h"
+
+1682000668 c:\users\filip\documents\github\logik---c\logik\constants.h
+
+1682020049 source:c:\users\filip\documents\github\logik---c\logik\logik.c
+	<time.h>
+	"constants.h"
+
+1682020015 c:\users\filip\documents\github\logik---c\logik\logik.h
+
+1682271386 source:c:\users\filip\documents\github\logik---c\logik\linkedlist.c
+	<stdio.h>
+
