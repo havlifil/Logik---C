@@ -2,7 +2,9 @@
 #define LINKEDLIST_H_INCLUDED
 
 typedef struct node {
-    char *p_nickname; // nickname saved in the node
+    char *p_name;
+    char *p_surname;
+    int ID;
     struct node *p_next; // address of the next node
 } NODE;
 
@@ -14,6 +16,9 @@ typedef struct {
 
 extern LIST *createList();
 extern void freeList(LIST *p_list);
-extern NODE *addToList(LIST *p_list, char *p_nickname);
+extern NODE *addToList(LIST *p_list, char *p_name, char *p_surname);
+extern void printList(LIST *p_list);
+extern LIST *generateRandomList(int numNodes);
+extern char *getString();
 
 #endif // LINKEDLIST_H_INCLUDED
