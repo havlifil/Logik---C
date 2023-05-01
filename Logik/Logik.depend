@@ -1,23 +1,45 @@
 # depslib dependency file v1.0
-1682444210 source:c:\users\filip\documents\github\logik---c\logik\main.c
+1682970380 source:c:\users\filip\documents\github\logik---c\logik\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
+	"conio2.h"
 	"constants.h"
 	"logik.h"
 	"linkedList.h"
+	"graphics.h"
 
-1682000668 c:\users\filip\documents\github\logik---c\logik\constants.h
+1682970396 c:\users\filip\documents\github\logik---c\logik\constants.h
 
-1682438446 source:c:\users\filip\documents\github\logik---c\logik\logik.c
+1682970380 source:c:\users\filip\documents\github\logik---c\logik\logik.c
 	<time.h>
 	"constants.h"
+	"graphics.h"
 
-1682438464 c:\users\filip\documents\github\logik---c\logik\logik.h
+1682970380 c:\users\filip\documents\github\logik---c\logik\logik.h
 
-1682444320 source:c:\users\filip\documents\github\logik---c\logik\linkedlist.c
+1682452820 source:c:\users\filip\documents\github\logik---c\logik\linkedlist.c
 	<stdio.h>
 	<string.h>
 
 1682442155 c:\users\filip\documents\github\logik---c\logik\linkedlist.h
+
+1682968954 source:c:\users\filip\documents\github\logik---c\logik\conio.c
+	<stdio.h>
+	<stdlib.h>
+	<windows.h>
+	<string.h>
+	"conio2.h"
+
+1682968954 c:\users\filip\documents\github\logik---c\logik\conio2.h
+	<conio.h>
+	<windows.h>
+
+1682968955 source:c:\users\filip\documents\github\logik---c\logik\graphics.c
+	<stdint.h>
+	"conio2.h"
+	"constants.h"
+
+1682968955 c:\users\filip\documents\github\logik---c\logik\graphics.h
+	<stdint.h>
 

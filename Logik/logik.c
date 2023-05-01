@@ -1,12 +1,13 @@
 #include <time.h>
 #include "constants.h"
+#include "graphics.h"
 
 typedef struct{
     int guessedColors;
     int guessedColorsInPositions;
 }INFORMATIVE_PINS;
 
-void getCombination(char *p_output, int combinationSize){
+void generateCombination(char *p_output, int combinationSize){
     srand(time(0));
     for(int i = 0; i<combinationSize; i++){
         *(p_output+i) = rand()%8;
@@ -71,8 +72,8 @@ void printCombination(char *p_combination, int combinationSize){
         case PIN_GRAY:
             printf("gray");
             break;
-        case PIN_BROWN:
-            printf("brown");
+        case PIN_MAGENTA:
+            printf("magenta");
             break;
         default:
             printf("unknown");
@@ -81,4 +82,54 @@ void printCombination(char *p_combination, int combinationSize){
         printf("\n");
     }
 }
+
+void drawCombination(char *p_combination, int combinationSize){
+    uint8_t color;
+    for(int i = 0; i<combinationSize; i++){
+        switch(*(p_combination+i)){
+        case PIN_RED:
+            color = COLOR_RED;
+            break;
+        case PIN_BLUE:
+            color = COLOR_BLUE;
+            break;
+        case PIN_YELLOW:
+            color = COLOR_YELLOW;
+            break;
+        case PIN_GREEN:
+            color = COLOR_GREEN;
+            break;
+        case PIN_MAGENTA:
+            color = COLOR_MAGENTA;
+            break;
+        case PIN_GRAY:
+            color = COLOR_GRAY;
+            break;
+        case PIN_BLACK:
+            color = COLOR_BLACK;
+            break;
+        case PIN_WHITE:
+            color = COLOR_WHITE;
+            break;
+        }
+        drawRect(2+(i*8)+(i*2), 2, 4, 4, color);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
