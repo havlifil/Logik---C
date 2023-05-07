@@ -1,28 +1,32 @@
 # depslib dependency file v1.0
-1682970380 source:c:\users\filip\documents\github\logik---c\logik\main.c
+1683477495 source:c:\users\filip\documents\github\logik---c\logik\main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
+	<stdbool.h>
+	<windows.h>
 	"conio2.h"
 	"constants.h"
 	"logik.h"
 	"linkedList.h"
 	"graphics.h"
 
-1682970396 c:\users\filip\documents\github\logik---c\logik\constants.h
+1683477495 c:\users\filip\documents\github\logik---c\logik\constants.h
 
-1682970380 source:c:\users\filip\documents\github\logik---c\logik\logik.c
+1683477609 source:c:\users\filip\documents\github\logik---c\logik\logik.c
 	<time.h>
+	<stdbool.h>
 	"constants.h"
-	"graphics.h"
 
-1682970380 c:\users\filip\documents\github\logik---c\logik\logik.h
+1683477609 c:\users\filip\documents\github\logik---c\logik\logik.h
+	<stdbool.h>
 
-1682452820 source:c:\users\filip\documents\github\logik---c\logik\linkedlist.c
+1683477495 source:c:\users\filip\documents\github\logik---c\logik\linkedlist.c
 	<stdio.h>
 	<string.h>
+	<stdbool.h>
 
-1682442155 c:\users\filip\documents\github\logik---c\logik\linkedlist.h
+1683477495 c:\users\filip\documents\github\logik---c\logik\linkedlist.h
 
 1682968954 source:c:\users\filip\documents\github\logik---c\logik\conio.c
 	<stdio.h>
@@ -40,6 +44,6 @@
 	"conio2.h"
 	"constants.h"
 
-1682968955 c:\users\filip\documents\github\logik---c\logik\graphics.h
+1683477680 c:\users\filip\documents\github\logik---c\logik\graphics.h
 	<stdint.h>
 

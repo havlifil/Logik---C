@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 typedef struct node {
     char *p_name;
     char *p_surname;
     int ID;
+    int bestScore;
     struct node *p_next; // address of the next node
 } NODE;
 
@@ -43,7 +45,7 @@ void freeList(LIST *p_list){
 }
 
 // adds one node (element) to the end of the list
-NODE *addToList(LIST *p_list, char *p_name, char *p_surname){
+NODE *addToList(LIST *p_list, char *p_name, char *p_surname, int bestScore){
     NODE *p_newNode;
     p_newNode = (NODE *) malloc(sizeof(NODE));
     if(p_newNode == NULL){
@@ -63,6 +65,7 @@ NODE *addToList(LIST *p_list, char *p_name, char *p_surname){
     p_newNode->p_name = p_name;
     p_newNode->p_surname = p_surname;
     p_newNode->ID = p_list->numNodes;
+    p_newNode->bestScore = bestScore;
     return p_newNode;
 }
 
@@ -77,9 +80,11 @@ void printList(LIST *p_list){
             printf("\nName: %s\n", p_actual->p_name);
             printf("Surname: %s\n", p_actual->p_surname);
             printf("ID: %d\n", p_actual->ID);
+            printf("best score: %d\n", p_actual->bestScore);
             p_actual = p_actual->p_next;
         }
     }
+
 }
 
 // generating random list
@@ -93,7 +98,14 @@ LIST *generateRandomList(int numNodes){
     for(int i = 0; i<numNodes; i++){
         length = rand()%14+1;
         for(int i = 0; i<length; i++){
-            buffer[i] = (char)(rand()%25+97);
+            switch(rand()%2){
+            case 0:
+                buffer[i] = (char)(rand()%26+97);
+                break;
+            case 1:
+                buffer[i] = (char)(rand()%26+65);
+                break;
+            }
         }
         buffer[length] = '\0';
         p_name = (char *) malloc((strlen(buffer)+1)*sizeof(char));
@@ -104,19 +116,30 @@ LIST *generateRandomList(int numNodes){
         strcpy(p_name, buffer);
         length = rand()%14+1;
         for(int i = 0; i<length; i++){
-            buffer[i] = (char)(rand()%25+97);
+            switch(rand()%2){
+            case 0:
+                buffer[i] = (char)(rand()%26+97);
+                break;
+            case 1:
+                buffer[i] = (char)(rand()%26+65);
+                break;
+            }
         }
         buffer[length] = '\0';
         p_surname = (char *) malloc((strlen(buffer)+1)*sizeof(char));
         if(p_surname == NULL){
-        printf("ERROR out of memory\n");
-        exit(-1);
+            printf("ERROR out of memory\n");
+            exit(-1);
         }
         strcpy(p_surname, buffer);
-        addToList(p_randomList, p_name, p_surname);
+        addToList(p_randomList, p_name, p_surname, 0);
     }
     return p_randomList;
 }
+
+/*---------*/
+/* STRINGS */
+/*---------*/
 
 // gets string from user properly
 char *getString(){
@@ -136,27 +159,126 @@ char *getString(){
     return p_newString;
 }
 
+void toLower(char *p_string){
+    for(int i = 0; p_string[i]!='\0'; i++){
+        if(((int)*(p_string+i)>64)&&((int)*(p_string+i)<91)){
+            *(p_string+i) = *(p_string+i)+32;
+        }
+    }
+}
+
 /*--------------------*/
 /* SORTING ALGORITHMS */
 /*--------------------*/
 
-void swap(LIST *p_list, NODE *p_node1, NODE *p_node2){
+// swaps two neighbouring nodes
+void swapNodes(LIST *p_list, NODE *p_nodeBefore, NODE *p_node1, NODE *p_node2){
     NODE *p_holder;
-    if((p_list->p_first == p_node1 && p_list->p_last == p_node2)||(p_list->p_first == p_node2 && p_list->p_last == p_node1)){
+    if(p_node1 == p_list->p_first && p_node2 == p_list->p_last){
+        p_node1->p_next = NULL;
+        p_node2->p_next = p_list->p_first;
         p_holder = p_list->p_first;
         p_list->p_first = p_list->p_last;
         p_list->p_last = p_holder;
+    } else if(p_node1 == p_list->p_first) {
+        p_holder = p_node1->p_next;
+        p_node1->p_next = p_node2->p_next;
+        p_node2->p_next = p_list->p_first;
+        p_list->p_first = p_holder;
+    } else if(p_node2 == p_list->p_last){
+        p_list->p_last = p_nodeBefore->p_next;
+        p_holder = p_nodeBefore->p_next;
+        p_nodeBefore->p_next = p_node1->p_next;
+        p_node1->p_next = p_node2->p_next;
+        p_node2->p_next = p_holder;
+    } else {
+        p_holder = p_nodeBefore->p_next;
+        p_nodeBefore->p_next = p_node1->p_next;
+        p_node1->p_next = p_node2->p_next;
+        p_node2->p_next = p_holder;
     }
-    p_holder = p_node1; // holds address of the first node during swapping
-    p_node1->p_next = p_node2->p_next;
-    p_node2->p_next = p_holder;
-}
-
-void partition(NODE *p_first, NODE p_last){
-
 }
 
 
+// sorts list by ID using bubbleSort
+void bubbleSortListByID(LIST *p_list){
+    bool swapped = true;
+    NODE *p_nodeBefore=NULL;
+    NODE *p_node1 = p_list->p_first;
+    NODE *p_node2 = p_list->p_first->p_next;
+    int j = p_list->numNodes-1;
+    while(swapped==true){
+        swapped = false;
+        while(p_node2 != NULL){
+            if(p_node1->ID>p_node2->ID){
+                swapNodes(p_list, p_nodeBefore, p_node1, p_node2);
+                swapped = true;
+            }
+            p_nodeBefore = p_node1;
+            p_node1 = p_node2;
+            p_node2 = p_node2->p_next;
+        }
+        p_node1 = p_list->p_first;
+        p_node2 = p_list->p_first->p_next;
+        j--;
+    }
+}
+
+void bubbleSortListByName(LIST *p_list){
+    bool swapped = true;
+    NODE *p_nodeBefore=NULL;
+    NODE *p_node1 = p_list->p_first;
+    NODE *p_node2 = p_list->p_first->p_next;
+    int j = p_list->numNodes-1;
+    while(swapped==true){
+        swapped = false;
+        while(p_node2 != NULL){
+            char string1[strlen(p_node1->p_name)+1], string2[strlen(p_node2->p_name)+1];
+            strcpy(string1, p_node1->p_name);
+            strcpy(string2, p_node2->p_name);
+            toLower(&string1[0]);
+            toLower(&string2[0]);
+            if(strcmp(string1, string2)>0){
+                swapNodes(p_list, p_nodeBefore, p_node1, p_node2);
+                swapped = true;
+            }
+            p_nodeBefore = p_node1;
+            p_node1 = p_node2;
+            p_node2 = p_node2->p_next;
+        }
+        p_node1 = p_list->p_first;
+        p_node2 = p_list->p_first->p_next;
+        j--;
+    }
+}
+
+void bubbleSortListBySurname(LIST *p_list){
+    bool swapped = true;
+    NODE *p_nodeBefore=NULL;
+    NODE *p_node1 = p_list->p_first;
+    NODE *p_node2 = p_list->p_first->p_next;
+    int j = p_list->numNodes-1;
+    while(swapped==true){
+        swapped = false;
+        while(p_node2 != NULL){
+            char string1[strlen(p_node1->p_surname)+1], string2[strlen(p_node2->p_surname)+1];
+            strcpy(string1, p_node1->p_surname);
+            strcpy(string2, p_node2->p_surname);
+            toLower(&string1[0]);
+            toLower(&string2[0]);
+            if(strcmp(string1, string2)>0){
+                swapNodes(p_list, p_nodeBefore, p_node1, p_node2);
+                swapped = true;
+            }
+            p_nodeBefore = p_node1;
+            p_node1 = p_node2;
+            p_node2 = p_node2->p_next;
+        }
+        p_node1 = p_list->p_first;
+        p_node2 = p_list->p_first->p_next;
+        j--;
+    }
+}
 
 
 
