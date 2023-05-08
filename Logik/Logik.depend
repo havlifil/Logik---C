@@ -39,9 +39,10 @@
 	<conio.h>
 	<windows.h>
 
-1682968955 source:c:\users\filip\documents\github\logik---c\logik\graphics.c
+1683477680 source:c:\users\filip\documents\github\logik---c\logik\graphics.c
 	<stdint.h>
 	"conio2.h"
+	"logik.h"
 	"constants.h"
 
 1683477680 c:\users\filip\documents\github\logik---c\logik\graphics.h

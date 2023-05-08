@@ -31,7 +31,23 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="conio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="conio2.h" />
 		<Unit filename="constants.h" />
+		<Unit filename="graphics.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="graphics.h" />
+		<Unit filename="linkedList.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="linkedList.h" />
+		<Unit filename="logik.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="logik.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
