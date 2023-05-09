@@ -3,62 +3,63 @@
 #include "constants.h"
 
 typedef struct{
-    char combination[COMBINATION_SIZE];
     int guessedColors;
     int guessedColorsInPositions;
-}COMBINATION;
+}INFORMATIVE_PINS;
 
-COMBINATION generateCombination(int combinationSize){
+void generateCombination(char *p_output, int combinationSize){
     srand(time(0));
-    COMBINATION combination;
     for(int i = 0; i<combinationSize; i++){
-        combination.combination[i] = rand()%8;
-        combination.guessedColors = -1;
-        combination.guessedColorsInPositions = -1;
+        *(p_output+i) = rand()%8;
     }
 }
 
-COMBINATION generateBlankCombination(char *p_output, int combinationSize){
+void generateBlankCombination(char *p_output, int combinationSize){
     srand(time(0));
-    COMBINATION combination;
     for(int i = 0; i<combinationSize; i++){
-        combination.combination[i] = PIN_NEUTRAL;
-        combination.guessedColors = -1;
-        combination.guessedColorsInPositions = -1;
+        *(p_output+i) = 8;
     }
 }
 
-bool combinationIsValid(COMBINATION combination, int combinationSize){
+bool combinationIsValid(char *p_combination, int combinationSize){
     for(int i = 0; i<combinationSize; i++){
-        if(combination.combination[i]==PIN_NEUTRAL){
+        if(*(p_combination+i)==PIN_NEUTRAL){
             return false;
         }
     }
     return true;
 }
 
-COMBINATION checkCombination(COMBINATION rightCombination, COMBINATION combination, int combinationSize){
-    combination.guessedColors = 0;
-    combination.guessedColorsInPositions = 0;
+INFORMATIVE_PINS checkCombination(char *p_rightCombination, char *p_combination, int combinationSize){
+    INFORMATIVE_PINS informativePins;
+    informativePins.guessedColors = 0;
+    informativePins.guessedColorsInPositions = 0;
+    // copy information about combinations from arrays
+    char rightCombination[combinationSize];
+    char combination[combinationSize];
+    for(int i = 0; i<combinationSize; i++){
+        rightCombination[i] = *(p_rightCombination+i);
+        combination[i] = *(p_combination+i);
+    }
     // check for pins with right color and position
     for(int i = 0; i<combinationSize; i++){
-        if(combination.combination[i]==rightCombination.combination[i]){
-            combination.guessedColorsInPositions++;
-            combination.combination[i] = '*';
-            rightCombination.combination[i] = '*';
+        if(combination[i]==rightCombination[i]){
+            informativePins.guessedColorsInPositions++;
+            combination[i] = '*';
+            rightCombination[i] = '*';
         }
     }
     // check for pins with only right color
     for(int i = 0; i<combinationSize; i++){
-        for(int x = 0; (x<combinationSize)&&(combination.combination[i]!='*'); x++){
-            if(combination.combination[i]==rightCombination.combination[x]){
-                combination.guessedColors++;
-                combination.combination[i] = '*';
-                rightCombination.combination[x] = '*';
+        for(int x = 0; (x<combinationSize)&&(combination[i]!='*'); x++){
+            if(combination[i]==rightCombination[x]){
+                informativePins.guessedColors++;
+                combination[i] = '*';
+                rightCombination[x] = '*';
             }
         }
     }
-    return combination;
+    return informativePins;
 }
 
 void printCombination(char *p_combination, int combinationSize){

@@ -23,11 +23,8 @@ int screenHome();
 
 int main()
 {
-    LIST *p_list = createList();
-    p_list = generateRandomList(10);
-    printList(p_list);
-    freeList(p_list);
-    /*ShowWindow(GetConsoleWindow(),SW_MAXIMIZE);
+
+    ShowWindow(GetConsoleWindow(),SW_MAXIMIZE);
     int actualScreen = -1;
     bool programRunning = true;
     while(programRunning){
@@ -37,11 +34,12 @@ int main()
             break;
         case SCREEN_GAME:
             screenGame();
+            actualScreen = -1;
             break;
         case SCREEN_SCOREBOARD:
             break;
         }
-    }*/
+    }
     return 0;
 }
 
@@ -109,20 +107,29 @@ void screenGame(){
     char actualCombination[COMBINATION_SIZE];
     generateBlankCombination(actualCombination, COMBINATION_SIZE);
     INFORMATIVE_PINS informativePins; // structure with information about success of users guess
+    informativePins.guessedColors = 0;
+    informativePins.guessedColorsInPositions = 0;
     bool gameInProgress = true;
     bool change = true; // true if any graphics changes
     char pressedKey; // stores pressed key
     int pinIndex = 0; // index of pin which is user editing
     int numAttemps = 0;
+    char **p_attempHistory = NULL;
     drawRect(69,1,25,100,3);
     while(gameInProgress){
         if(change == true){
             drawRect(1,1,25,8,3);
             drawRect((pinIndex*10)+1,1,5,6,10);
             drawCombination(2,2,actualCombination,informativePins,COMBINATION_SIZE);
+            for(int i = numAttemps-1; i>-1; i--){
+                INFORMATIVE_PINS informativePins = checkCombination(rightCombination, p_attempHistory[i], COMBINATION_SIZE);
+                drawCombinationSmall(70, ((numAttemps-1)*5+2)-(i*5), p_attempHistory[i], informativePins, COMBINATION_SIZE);
+            }
             gotoxy(52,1);
             textbackground(0);
             printf("ATTEMPS: %d", numAttemps);
+            gotoxy(1,20);
+            printCombination(rightCombination, COMBINATION_SIZE);
             change = false;
         }
         if(kbhit()){
@@ -157,12 +164,35 @@ void screenGame(){
             case '\r':
                 if(combinationIsValid(actualCombination, COMBINATION_SIZE)){
                     informativePins = checkCombination(rightCombination, actualCombination, COMBINATION_SIZE);
+                    if(informativePins.guessedColorsInPositions == 5){
+                        gameInProgress = false;
+                    }
                     numAttemps++;
-                    drawCombinationSmall(70, 2+((numAttemps-1)*5), actualCombination, informativePins, COMBINATION_SIZE);
+                    if(p_attempHistory == NULL){
+                        p_attempHistory = (char **)malloc(sizeof(char *));
+                    } else {
+                        p_attempHistory = (char **)realloc(p_attempHistory, sizeof(char *));
+                    }
+                    if(p_attempHistory == NULL){
+                        printf("ERROR out of memory\n");
+                        exit(-1);
+                    }
+                    p_attempHistory[numAttemps-1] = (char *) malloc(COMBINATION_SIZE*sizeof(char *));
+                    if(p_attempHistory[numAttemps-1] == NULL){
+                        printf("ERROR out of memory\n");
+                        exit(-1);
+                    }
+                    for(int i = 0; i<COMBINATION_SIZE; i++){
+                        *(p_attempHistory[numAttemps-1]+i) = actualCombination[i];
+                    }
                     change = true;
                 }
                 break;
             }
         }
     }
+    for(int i = 0; i<numAttemps; i++){
+        free(p_attempHistory[i]);
+    }
+    free(p_attempHistory);
 }
