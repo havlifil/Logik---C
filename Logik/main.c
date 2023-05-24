@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
 #include <windows.h>
@@ -10,36 +11,43 @@
 #include "linkedList.h"
 #include "graphics.h"
 
-void setNewUser(LIST *p_list){
+void setNewUser(LIST *p_list, uint16_t bestScore){
     printf("Name: ");
-    char *p_name = getString();
+    char *p_name = getNameSurname();
     printf("Surname: ");
-    char *p_surname = getString();
-    addToList(p_list, p_name, p_surname);
+    char *p_surname = getNameSurname();
+    addToList(p_list, p_name, p_surname, bestScore);
 }
 
-void screenGame();
+uint16_t screenGame();
 int screenHome();
 
 int main()
 {
-
+    LIST *p_userList = createList();
+    loadList(p_userList);
     ShowWindow(GetConsoleWindow(),SW_MAXIMIZE);
     int actualScreen = -1;
     bool programRunning = true;
+    uint16_t bestScore;
     while(programRunning){
         switch(actualScreen){
         case SCREEN_HOME:
             actualScreen = screenHome();
             break;
         case SCREEN_GAME:
-            screenGame();
+            bestScore = screenGame();
+            clrscr();
+            setNewUser(p_userList, bestScore);
             actualScreen = -1;
             break;
         case SCREEN_SCOREBOARD:
+            programRunning = false;
             break;
         }
     }
+    saveList(p_userList);
+    freeList(p_userList);
     return 0;
 }
 
@@ -98,7 +106,7 @@ int screenHome(){
     }
 }
 
-void screenGame(){
+uint16_t screenGame(){
     clrscr();
     // generating random right combination
     char rightCombination[COMBINATION_SIZE];
@@ -120,7 +128,7 @@ void screenGame(){
         if(change == true){
             drawRect(1,1,25,8,3);
             drawRect((pinIndex*10)+1,1,5,6,10);
-            drawCombination(2,2,actualCombination,informativePins,COMBINATION_SIZE);
+            drawCombination(2,2,actualCombination,COMBINATION_SIZE);
             for(int i = numAttemps-1; i>-1; i--){
                 INFORMATIVE_PINS informativePins = checkCombination(rightCombination, p_attempHistory[i], COMBINATION_SIZE);
                 drawCombinationSmall(70, ((numAttemps-1)*5+2)-(i*5), p_attempHistory[i], informativePins, COMBINATION_SIZE);
@@ -195,4 +203,5 @@ void screenGame(){
         free(p_attempHistory[i]);
     }
     free(p_attempHistory);
+    return numAttemps;
 }

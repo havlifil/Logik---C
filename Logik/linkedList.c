@@ -1,17 +1,25 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
+
+#include "constants.h"
+
+/*--------------*/
+/* LINKED LISTS */
+/*--------------*/
 
 typedef struct node {
     char *p_name;
     char *p_surname;
-    int ID;
-    int bestScore;
+    uint16_t ID;
+    uint16_t bestScore;
     struct node *p_next; // address of the next node
 } NODE;
 
 typedef struct {
-    int numNodes; // number of nodes in the list
+    uint16_t numNodes; // number of nodes in the list
     NODE *p_first; // address of the first node
     NODE *p_last; // address of the last node
 } LIST;
@@ -45,7 +53,7 @@ void freeList(LIST *p_list){
 }
 
 // adds one node (element) to the end of the list
-NODE *addToList(LIST *p_list, char *p_name, char *p_surname, int bestScore){
+NODE *addToList(LIST *p_list, char *p_name, char *p_surname, uint16_t bestScore){
     NODE *p_newNode;
     p_newNode = (NODE *) malloc(sizeof(NODE));
     if(p_newNode == NULL){
@@ -71,8 +79,7 @@ NODE *addToList(LIST *p_list, char *p_name, char *p_surname, int bestScore){
 
 // prints whole list
 void printList(LIST *p_list){
-    NODE *p_actual;
-    p_actual = p_list->p_first;
+    NODE *p_actual = p_list->p_first;
     if(p_actual == NULL){
         printf("List is empty.\n");
     } else {
@@ -84,7 +91,6 @@ void printList(LIST *p_list){
             p_actual = p_actual->p_next;
         }
     }
-
 }
 
 // generating random list
@@ -137,19 +143,112 @@ LIST *generateRandomList(int numNodes){
     return p_randomList;
 }
 
+// saves list to file
+void saveList(LIST *p_list){
+    bubbleSortListByID(p_list);
+    FILE *p_fw = fopen("logik.dat", "w");
+    NODE *p_actual = p_list->p_first;
+    while(p_actual != NULL){
+        fputs(p_actual->p_name, p_fw);
+        fputc('|', p_fw);
+        fputs(p_actual->p_surname, p_fw);
+        fputc('|', p_fw);
+        fprintf(p_fw, "%d", p_actual->bestScore);
+        fputc('\n', p_fw);
+        p_actual = p_actual->p_next;
+    }
+    fclose(p_fw);
+}
+
+// loads list from file
+void *loadList(LIST *p_destination){
+    FILE *p_fr = fopen("logik.dat", "r");
+    char actualChar = fgetc(p_fr);
+    char name[NAMESURNAME_LENGTH];
+    char surname[NAMESURNAME_LENGTH];
+    char bestScore[6];
+    while(actualChar != EOF){
+        while(actualChar != '\n'){
+            int i = 0;
+            while(actualChar != '|'){
+                name[i] = actualChar;
+                actualChar = fgetc(p_fr);
+                i++;
+            }
+            name[i] = '\0';
+            i = 0;
+            actualChar = fgetc(p_fr);
+            while(actualChar != '|'){
+                surname[i] = actualChar;
+                actualChar = fgetc(p_fr);
+                i++;
+            }
+            surname[i] = '\0';
+            i = 0;
+            actualChar = fgetc(p_fr);
+            while(actualChar != '\n'){
+                bestScore[i] = actualChar;
+                actualChar = fgetc(p_fr);
+                i++;
+            }
+            bestScore[i] = '\0';
+        }
+        int bestScoreInt = atoi(bestScore);
+        char *p_name = (char *) malloc((strlen(name)+1)*sizeof(char));
+        if(p_name == NULL){
+            printf("ERROR out of memory\n");
+            exit(-1);
+        }
+        strcpy(p_name, name);
+        char *p_surname = (char *) malloc((strlen(surname)+1)*sizeof(char));
+        if(p_surname == NULL){
+            printf("ERROR out of memory\n");
+            exit(-1);
+        }
+        strcpy(p_surname, surname);
+        addToList(p_destination, p_name, p_surname, bestScoreInt);
+        actualChar = fgetc(p_fr);
+    }
+    fclose(p_fr);
+}
+
 /*---------*/
 /* STRINGS */
 /*---------*/
 
-// gets string from user properly
-char *getString(){
-    char buffer[1024];
-    char *p_newString;
-    int ee = scanf(" %1023[^\n]s", buffer);
-    if(ee = NULL){
-        printf("ERROR scanf\n");
-        exit(-2);
+// checks if string is valid
+bool validateString(char *p_string){
+    if(strlen(p_string)>NAMESURNAME_LENGTH){
+        return false;
     }
+    char actualChar = *p_string;
+    int i = 0;
+    while(actualChar != '\0'){
+        if((actualChar < 'A' || actualChar > 'Z') && (actualChar < 'a' || actualChar > 'z')){
+            return false;
+        }
+        i++;
+        actualChar = *(p_string+i);
+    }
+    return true;
+}
+
+// gets string from user properly
+char *getNameSurname(){
+    bool valid = false;
+    char buffer[1024];
+    while(!valid){
+        int ee = scanf(" %1023[^\n]s", buffer);
+        if(ee = 0){
+            printf("ERROR scanf\n");
+            exit(-2);
+        }
+        valid = validateString(buffer);
+        if(valid == false){
+            printf("string is not valid");
+        }
+    }
+    char *p_newString;
     p_newString = (char *) malloc((strlen(buffer)+1)*sizeof(char));
     if(p_newString == NULL){
         printf("ERROR out of memory\n");
@@ -159,6 +258,7 @@ char *getString(){
     return p_newString;
 }
 
+// converts all letters to lower
 void toLower(char *p_string){
     for(int i = 0; p_string[i]!='\0'; i++){
         if(((int)*(p_string+i)>64)&&((int)*(p_string+i)<91)){
@@ -199,84 +299,91 @@ void swapNodes(LIST *p_list, NODE *p_nodeBefore, NODE *p_node1, NODE *p_node2){
     }
 }
 
-
 // sorts list by ID using bubbleSort
 void bubbleSortListByID(LIST *p_list){
-    bool swapped = true;
-    NODE *p_nodeBefore=NULL;
-    NODE *p_node1 = p_list->p_first;
-    NODE *p_node2 = p_list->p_first->p_next;
-    int j = p_list->numNodes-1;
-    while(swapped==true){
-        swapped = false;
-        while(p_node2 != NULL){
-            if(p_node1->ID>p_node2->ID){
-                swapNodes(p_list, p_nodeBefore, p_node1, p_node2);
-                swapped = true;
+    if(p_list->p_first != NULL){
+        bool swapped = true;
+        NODE *p_nodeBefore=NULL;
+        NODE *p_node1 = p_list->p_first;
+        NODE *p_node2 = p_list->p_first->p_next;
+        int j = p_list->numNodes-1;
+        while(swapped==true){
+            swapped = false;
+            while(p_node2 != NULL){
+                if(p_node1->ID>p_node2->ID){
+                    swapNodes(p_list, p_nodeBefore, p_node1, p_node2);
+                    swapped = true;
+                }
+                p_nodeBefore = p_node1;
+                p_node1 = p_node2;
+                p_node2 = p_node2->p_next;
             }
-            p_nodeBefore = p_node1;
-            p_node1 = p_node2;
-            p_node2 = p_node2->p_next;
+            p_node1 = p_list->p_first;
+            p_node2 = p_list->p_first->p_next;
+            j--;
         }
-        p_node1 = p_list->p_first;
-        p_node2 = p_list->p_first->p_next;
-        j--;
     }
 }
 
+// sorts list by names
 void bubbleSortListByName(LIST *p_list){
-    bool swapped = true;
-    NODE *p_nodeBefore=NULL;
-    NODE *p_node1 = p_list->p_first;
-    NODE *p_node2 = p_list->p_first->p_next;
-    int j = p_list->numNodes-1;
-    while(swapped==true){
-        swapped = false;
-        while(p_node2 != NULL){
-            char string1[strlen(p_node1->p_name)+1], string2[strlen(p_node2->p_name)+1];
-            strcpy(string1, p_node1->p_name);
-            strcpy(string2, p_node2->p_name);
-            toLower(&string1[0]);
-            toLower(&string2[0]);
-            if(strcmp(string1, string2)>0){
-                swapNodes(p_list, p_nodeBefore, p_node1, p_node2);
-                swapped = true;
+    if(p_list->p_first != NULL){
+        bool swapped = true;
+        NODE *p_nodeBefore=NULL;
+        NODE *p_node1 = p_list->p_first;
+        NODE *p_node2 = p_list->p_first->p_next;
+        int j = p_list->numNodes-1;
+        while(swapped==true){
+            swapped = false;
+            while(p_node2 != NULL){
+                char string1[strlen(p_node1->p_name)+1], string2[strlen(p_node2->p_name)+1];
+                strcpy(string1, p_node1->p_name);
+                strcpy(string2, p_node2->p_name);
+                toLower(&string1[0]);
+                toLower(&string2[0]);
+                if(strcmp(string1, string2)>0){
+                    swapNodes(p_list, p_nodeBefore, p_node1, p_node2);
+                    swapped = true;
+                }
+                p_nodeBefore = p_node1;
+                p_node1 = p_node2;
+                p_node2 = p_node2->p_next;
             }
-            p_nodeBefore = p_node1;
-            p_node1 = p_node2;
-            p_node2 = p_node2->p_next;
+            p_node1 = p_list->p_first;
+            p_node2 = p_list->p_first->p_next;
+            j--;
         }
-        p_node1 = p_list->p_first;
-        p_node2 = p_list->p_first->p_next;
-        j--;
     }
 }
 
+// sorts list by surnames
 void bubbleSortListBySurname(LIST *p_list){
-    bool swapped = true;
-    NODE *p_nodeBefore=NULL;
-    NODE *p_node1 = p_list->p_first;
-    NODE *p_node2 = p_list->p_first->p_next;
-    int j = p_list->numNodes-1;
-    while(swapped==true){
-        swapped = false;
-        while(p_node2 != NULL){
-            char string1[strlen(p_node1->p_surname)+1], string2[strlen(p_node2->p_surname)+1];
-            strcpy(string1, p_node1->p_surname);
-            strcpy(string2, p_node2->p_surname);
-            toLower(&string1[0]);
-            toLower(&string2[0]);
-            if(strcmp(string1, string2)>0){
-                swapNodes(p_list, p_nodeBefore, p_node1, p_node2);
-                swapped = true;
+    if(p_list != NULL){
+        bool swapped = true;
+        NODE *p_nodeBefore=NULL;
+        NODE *p_node1 = p_list->p_first;
+        NODE *p_node2 = p_list->p_first->p_next;
+        int j = p_list->numNodes-1;
+        while(swapped==true){
+            swapped = false;
+            while(p_node2 != NULL){
+                char string1[strlen(p_node1->p_surname)+1], string2[strlen(p_node2->p_surname)+1];
+                strcpy(string1, p_node1->p_surname);
+                strcpy(string2, p_node2->p_surname);
+                toLower(&string1[0]);
+                toLower(&string2[0]);
+                if(strcmp(string1, string2)>0){
+                    swapNodes(p_list, p_nodeBefore, p_node1, p_node2);
+                    swapped = true;
+                }
+                p_nodeBefore = p_node1;
+                p_node1 = p_node2;
+                p_node2 = p_node2->p_next;
             }
-            p_nodeBefore = p_node1;
-            p_node1 = p_node2;
-            p_node2 = p_node2->p_next;
+            p_node1 = p_list->p_first;
+            p_node2 = p_list->p_first->p_next;
+            j--;
         }
-        p_node1 = p_list->p_first;
-        p_node2 = p_list->p_first->p_next;
-        j--;
     }
 }
 

@@ -3,6 +3,7 @@
 
 // program setup
 #define COMBINATION_SIZE 5
+#define NAMESURNAME_LENGTH 20
 
 // pins
 #define PIN_RED 0b0

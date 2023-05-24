@@ -19,7 +19,7 @@ void drawRect(int x, int y, int width, int height, uint8_t color){
 /* SCREENS */
 /*---------*/
 
-void drawCombination(int x, int y, char *p_combination, INFORMATIVE_PINS informativePins, int combinationSize){
+void drawCombination(int x, int y, char *p_combination, int combinationSize){
     uint8_t color;
     for(int i = 0; i<combinationSize; i++){
         switch(*(p_combination+i)){
@@ -52,16 +52,6 @@ void drawCombination(int x, int y, char *p_combination, INFORMATIVE_PINS informa
             break;
         }
         drawRect(x+(i*8)+(i*2), y, 4, 4, color);
-    }
-    if(informativePins.guessedColorsInPositions !=0){
-        for(int i = 0; i<informativePins.guessedColorsInPositions; i++){
-            drawRect(x+(i*2)+i, y+5, 1, 1, COLOR_INFO_COLOR_IN_POSITION);
-        }
-    }
-    if(informativePins.guessedColors !=0){
-        for(int i = 0; i<informativePins.guessedColors; i++){
-            drawRect(x+(informativePins.guessedColorsInPositions*3)+(i*2)+i, y+5, 1, 1, COLOR_INFO_COLOR);
-        }
     }
 }
 
