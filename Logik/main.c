@@ -21,10 +21,11 @@ void setNewUser(LIST *p_list, uint16_t bestScore){
 
 uint16_t screenGame();
 int screenHome();
+void screenScoreboard(LIST *p_list);
 
 int main()
 {
-    LIST *p_userList = createList();
+    LIST *p_userList = generateRandomList(30);//createList();
     loadList(p_userList);
     ShowWindow(GetConsoleWindow(),SW_MAXIMIZE);
     int actualScreen = -1;
@@ -39,10 +40,13 @@ int main()
             bestScore = screenGame();
             clrscr();
             setNewUser(p_userList, bestScore);
-            actualScreen = -1;
+            actualScreen = SCREEN_HOME;
             break;
         case SCREEN_SCOREBOARD:
-            programRunning = false;
+            clrscr();
+            gotoxy(0,0);
+            screenScoreboard(p_userList);
+            actualScreen = SCREEN_HOME;
             break;
         }
     }
@@ -204,4 +208,17 @@ uint16_t screenGame(){
     }
     free(p_attempHistory);
     return numAttemps;
+}
+
+void screenScoreboard(LIST *p_list){
+    printScoreboard(p_list);
+    bool scoreboardInProgress = true;
+    while(scoreboardInProgress){
+        if(kbhit()){
+            char pressedKey = getch();
+            if(pressedKey == 27){
+                scoreboardInProgress = false;
+            }
+        }
+    }
 }

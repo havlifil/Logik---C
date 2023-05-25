@@ -3,6 +3,7 @@
 
 #include "conio2.h"
 #include "logik.h"
+#include "linkedList.h"
 #include "constants.h"
 
 void drawRect(int x, int y, int width, int height, uint8_t color){
@@ -19,6 +20,9 @@ void drawRect(int x, int y, int width, int height, uint8_t color){
 /* SCREENS */
 /*---------*/
 
+// SCREEN GAME
+
+// draws combination
 void drawCombination(int x, int y, char *p_combination, int combinationSize){
     uint8_t color;
     for(int i = 0; i<combinationSize; i++){
@@ -55,6 +59,7 @@ void drawCombination(int x, int y, char *p_combination, int combinationSize){
     }
 }
 
+// draws smaller combination with including informative pins
 void drawCombinationSmall(int x, int y, char *p_combination, INFORMATIVE_PINS informativePins, int combinationSize){
     uint8_t color;
     for(int i = 0; i<combinationSize; i++){
@@ -98,5 +103,31 @@ void drawCombinationSmall(int x, int y, char *p_combination, INFORMATIVE_PINS in
         for(int i = 0; i<informativePins.guessedColors; i++){
             drawRect(x+(informativePins.guessedColorsInPositions*3)+(i*2)+i, y+3, 1, 1, COLOR_INFO_COLOR);
         }
+    }
+}
+
+// SCREEN SCOREBOARD
+
+void printScoreboard(LIST *p_list){
+    bubbleSortListByID(p_list);
+    NODE *p_actual = p_list->p_first;
+    printf("By ID:\n");
+    while(p_actual != NULL){
+        printf("ID: %d NAME: %s SURNAME: %s BESTSCORE: %d\n", p_actual->ID, p_actual->p_name, p_actual->p_surname, p_actual->bestScore);
+        p_actual = p_actual->p_next;
+    }
+    bubbleSortListByName(p_list);
+    p_actual = p_list->p_first;
+    printf("By name:\n");
+    while(p_actual != NULL){
+        printf("ID: %d NAME: %s SURNAME: %s BESTSCORE: %d\n", p_actual->ID, p_actual->p_name, p_actual->p_surname, p_actual->bestScore);
+        p_actual = p_actual->p_next;
+    }
+    bubbleSortListBySurname(p_list);
+    p_actual = p_list->p_first;
+    printf("By surname:\n");
+    while(p_actual != NULL){
+        printf("ID: %d NAME: %s SURNAME: %s BESTSCORE: %d\n", p_actual->ID, p_actual->p_name, p_actual->p_surname, p_actual->bestScore);
+        p_actual = p_actual->p_next;
     }
 }

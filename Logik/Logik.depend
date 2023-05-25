@@ -53,3 +53,59 @@
 1684947563 c:\users\filip\documents\github\logik---c\logik\graphics.h
 	<stdint.h>
 
+1685018636 source:c:\users\havlifil\documents\github\logik---c\logik\conio.c
+	<stdio.h>
+	<stdlib.h>
+	<windows.h>
+	<string.h>
+	"conio2.h"
+
+1685018636 c:\users\havlifil\documents\github\logik---c\logik\conio2.h
+	<conio.h>
+	<windows.h>
+
+1685018636 source:c:\users\havlifil\documents\github\logik---c\logik\logik.c
+	<time.h>
+	<stdbool.h>
+	"constants.h"
+
+1685021943 c:\users\havlifil\documents\github\logik---c\logik\constants.h
+
+1685022989 source:c:\users\havlifil\documents\github\logik---c\logik\graphics.c
+	<stdint.h>
+	<stdio.h>
+	"conio2.h"
+	"logik.h"
+	"linkedList.h"
+	"constants.h"
+
+1685018636 c:\users\havlifil\documents\github\logik---c\logik\logik.h
+	<stdbool.h>
+
+1685022989 c:\users\havlifil\documents\github\logik---c\logik\linkedlist.h
+	<stdint.h>
+
+1685022989 source:c:\users\havlifil\documents\github\logik---c\logik\linkedlist.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<stdbool.h>
+	<stdint.h>
+	"constants.h"
+
+1685022539 source:c:\users\havlifil\documents\github\logik---c\logik\main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	<string.h>
+	<stdbool.h>
+	<windows.h>
+	"conio2.h"
+	"constants.h"
+	"logik.h"
+	"linkedList.h"
+	"graphics.h"
+
+1685021943 c:\users\havlifil\documents\github\logik---c\logik\graphics.h
+	<stdint.h>
+
