@@ -1,11 +1,38 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <windows.h>
 
 #include "conio2.h"
 #include "logik.h"
 #include "linkedList.h"
 #include "constants.h"
 
+// gets command line width
+int getCommandLineWidth() {
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    int columns;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+    return columns;
+}
+
+// gets command line height
+int getCommandLineHeight() {
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    int rows;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+    return rows;
+}
+
+// sets all colors to default and places cursor to 1,1
+void setDefaultGraphics(){
+    textbackground(0);
+    textcolor(15);
+    gotoxy(1,1);
+}
+
+// draws rectangle from x, y with current width and height
 void drawRect(int x, int y, int width, int height, uint8_t color){
     textbackground(color);
     for(int i = 0; i<height; i++){

@@ -22,10 +22,11 @@ void setNewUser(LIST *p_list, uint16_t bestScore){
 uint16_t screenGame();
 int screenHome();
 void screenScoreboard(LIST *p_list);
+void screenTournament();
 
 int main()
 {
-    LIST *p_userList = generateRandomList(30);//createList();
+    LIST *p_userList = createList();
     loadList(p_userList);
     ShowWindow(GetConsoleWindow(),SW_MAXIMIZE);
     int actualScreen = -1;
@@ -48,6 +49,13 @@ int main()
             screenScoreboard(p_userList);
             actualScreen = SCREEN_HOME;
             break;
+        case SCREEN_TOURNAMENT:
+            screenTournament();
+            actualScreen = SCREEN_HOME;
+            break;
+        case SCREEN_QUIT:
+            programRunning = false;
+            break;
         }
     }
     saveList(p_userList);
@@ -56,6 +64,8 @@ int main()
 }
 
 int screenHome(){
+    int width = getCommandLineWidth();
+    int height = getCommandLineHeight();
     int menuIndex = 0;
     bool menuInProgress = true;
     bool change = true;
@@ -63,26 +73,45 @@ int screenHome(){
     clrscr();
     while(menuInProgress){
         if(change==true){
-            gotoxy(10,10);
+            gotoxy(width/2-10,height/2-9);
             printf("MENU");
-            drawRect(10,11,10,5,COLOR_WHITE);
+            drawRect(width/2-10,height/2-8,10,5,COLOR_WHITE);
             if(menuIndex == 0){
-                drawRect(11,12,9,3,10);
+                drawRect(width/2-9,height/2-7,9,3,10);
             } else {
-                drawRect(11,12,9,3,COLOR_BLACK);
+                drawRect(width/2-9,height/2-7,9,3,COLOR_BLACK);
             }
-            gotoxy(12,13);
+            gotoxy(width/2-6,height/2-6);
             textbackground(0);
             printf("PLAY");
-            drawRect(10,15,10,5,COLOR_WHITE);
+            drawRect(width/2-10,height/2-4,10,5,COLOR_WHITE);
             if(menuIndex == 1){
-                drawRect(11,16,9,3,10);
+                drawRect(width/2-9,height/2-3,9,3,10);
             } else {
-                drawRect(11,16,9,3,COLOR_BLACK);
+                drawRect(width/2-9,height/2-3,9,3,COLOR_BLACK);
             }
-            gotoxy(12,17);
+            gotoxy(width/2-6,height/2-2);
             textbackground(0);
             printf("PLAYERS");
+            drawRect(width/2-10,height/2,10,5,COLOR_WHITE);
+            if(menuIndex == 2){
+                drawRect(width/2-9,height/2+1,9,3,10);
+            } else {
+                drawRect(width/2-9,height/2+1,9,3,COLOR_BLACK);
+            }
+            gotoxy(width/2-6,height/2+2);
+            textbackground(0);
+            printf("TOURNAMENT");
+            drawRect(width/2-10,height/2+4,10,5,COLOR_WHITE);
+            if(menuIndex == 3){
+                drawRect(width/2-9,height/2+5,9,3,10);
+            } else {
+                drawRect(width/2-9,height/2+5,9,3,COLOR_BLACK);
+            }
+            gotoxy(width/2-6,height/2+6);
+            textbackground(0);
+            printf("SAVE & QUIT");
+            setDefaultGraphics();
             change = false;
         }
         if(kbhit()){
@@ -97,8 +126,8 @@ int screenHome(){
                 break;
             case 's':
                 menuIndex++;
-                if(menuIndex>1){
-                    menuIndex = 1;
+                if(menuIndex>3){
+                    menuIndex = 3;
                 }
                 change = true;
                 break;
@@ -183,7 +212,7 @@ uint16_t screenGame(){
                     if(p_attempHistory == NULL){
                         p_attempHistory = (char **)malloc(sizeof(char *));
                     } else {
-                        p_attempHistory = (char **)realloc(p_attempHistory, sizeof(char *));
+                        p_attempHistory = (char **)realloc(p_attempHistory, numAttemps*sizeof(char *));
                     }
                     if(p_attempHistory == NULL){
                         printf("ERROR out of memory\n");
@@ -222,3 +251,26 @@ void screenScoreboard(LIST *p_list){
         }
     }
 }
+
+void screenTournament(){
+    uint16_t score1 = screenGame();
+    uint16_t score2 = screenGame();
+    clrscr();
+    if(score1==score2){
+        printf("Draw");
+    } else if (score1<score2) {
+        printf("P1 won");
+    } else {
+        printf("P2 won");
+    }
+    bool tournamentInProgress = true;
+    while(tournamentInProgress){
+        if(kbhit()){
+            char pressedKey = getch();
+            if(pressedKey == 27){
+                tournamentInProgress = false;
+            }
+        }
+    }
+}
+

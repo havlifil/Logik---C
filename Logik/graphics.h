@@ -3,6 +3,9 @@
 #ifndef GRAPHICS_H_INCLUDED
 #define GRAPHICS_H_INCLUDED
 
+extern int getCommandLineWidth();
+extern int getCommandLineHeight();
+extern void setDefaultGraphics();
 extern void drawRect(int x, int y, int width, int height, uint8_t color);
 extern void drawCombination(int x, int y, char *p_combination, int combinationSize);
 extern void drawCombinationSmall(int x, int y, char *p_combination, INFORMATIVE_PINS informativePins, int combinationSize);

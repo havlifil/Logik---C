@@ -1,7 +1,8 @@
 # depslib dependency file v1.0
-1684967356 source:c:\users\filip\documents\github\logik---c\logik\main.c
+1685055273 source:c:\users\filip\documents\github\logik---c\logik\main.c
 	<stdio.h>
 	<stdlib.h>
+	<stdint.h>
 	<string.h>
 	<stdbool.h>
 	<windows.h>
@@ -11,7 +12,7 @@
 	"linkedList.h"
 	"graphics.h"
 
-1684962499 c:\users\filip\documents\github\logik---c\logik\constants.h
+1685044310 c:\users\filip\documents\github\logik---c\logik\constants.h
 
 1683446586 source:c:\users\filip\documents\github\logik---c\logik\logik.c
 	<time.h>
@@ -21,7 +22,7 @@
 1683647296 c:\users\filip\documents\github\logik---c\logik\logik.h
 	<stdbool.h>
 
-1684968649 source:c:\users\filip\documents\github\logik---c\logik\linkedlist.c
+1685052082 source:c:\users\filip\documents\github\logik---c\logik\linkedlist.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -29,7 +30,7 @@
 	<stdint.h>
 	"constants.h"
 
-1684967343 c:\users\filip\documents\github\logik---c\logik\linkedlist.h
+1684968649 c:\users\filip\documents\github\logik---c\logik\linkedlist.h
 	<stdint.h>
 
 1683446586 source:c:\users\filip\documents\github\logik---c\logik\conio.c
@@ -43,14 +44,16 @@
 	<conio.h>
 	<windows.h>
 
-1684947547 source:c:\users\filip\documents\github\logik---c\logik\graphics.c
+1685055273 source:c:\users\filip\documents\github\logik---c\logik\graphics.c
 	<stdint.h>
 	<stdio.h>
+	<windows.h>
 	"conio2.h"
 	"logik.h"
+	"linkedList.h"
 	"constants.h"
 
-1684947563 c:\users\filip\documents\github\logik---c\logik\graphics.h
+1685055273 c:\users\filip\documents\github\logik---c\logik\graphics.h
 	<stdint.h>
 
 1685018636 source:c:\users\havlifil\documents\github\logik---c\logik\conio.c

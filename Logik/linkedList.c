@@ -163,51 +163,53 @@ void saveList(LIST *p_list){
 // loads list from file
 void *loadList(LIST *p_destination){
     FILE *p_fr = fopen("logik.dat", "r");
-    char actualChar = fgetc(p_fr);
-    char name[NAMESURNAME_LENGTH];
-    char surname[NAMESURNAME_LENGTH];
-    char bestScore[6];
-    while(actualChar != EOF){
-        while(actualChar != '\n'){
-            int i = 0;
-            while(actualChar != '|'){
-                name[i] = actualChar;
-                actualChar = fgetc(p_fr);
-                i++;
-            }
-            name[i] = '\0';
-            i = 0;
-            actualChar = fgetc(p_fr);
-            while(actualChar != '|'){
-                surname[i] = actualChar;
-                actualChar = fgetc(p_fr);
-                i++;
-            }
-            surname[i] = '\0';
-            i = 0;
-            actualChar = fgetc(p_fr);
+    if(p_fr != NULL) {
+        char actualChar = fgetc(p_fr);
+        char name[NAMESURNAME_LENGTH];
+        char surname[NAMESURNAME_LENGTH];
+        char bestScore[6];
+        while(actualChar != EOF){
             while(actualChar != '\n'){
-                bestScore[i] = actualChar;
+                int i = 0;
+                while(actualChar != '|'){
+                    name[i] = actualChar;
+                    actualChar = fgetc(p_fr);
+                    i++;
+                }
+                name[i] = '\0';
+                i = 0;
                 actualChar = fgetc(p_fr);
-                i++;
+                while(actualChar != '|'){
+                    surname[i] = actualChar;
+                    actualChar = fgetc(p_fr);
+                    i++;
+                }
+                surname[i] = '\0';
+                i = 0;
+                actualChar = fgetc(p_fr);
+                while(actualChar != '\n'){
+                    bestScore[i] = actualChar;
+                    actualChar = fgetc(p_fr);
+                    i++;
+                }
+                bestScore[i] = '\0';
             }
-            bestScore[i] = '\0';
+            int bestScoreInt = atoi(bestScore);
+            char *p_name = (char *) malloc((strlen(name)+1)*sizeof(char));
+            if(p_name == NULL){
+                printf("ERROR out of memory\n");
+                exit(-1);
+            }
+            strcpy(p_name, name);
+            char *p_surname = (char *) malloc((strlen(surname)+1)*sizeof(char));
+            if(p_surname == NULL){
+                printf("ERROR out of memory\n");
+                exit(-1);
+            }
+            strcpy(p_surname, surname);
+            addToList(p_destination, p_name, p_surname, bestScoreInt);
+            actualChar = fgetc(p_fr);
         }
-        int bestScoreInt = atoi(bestScore);
-        char *p_name = (char *) malloc((strlen(name)+1)*sizeof(char));
-        if(p_name == NULL){
-            printf("ERROR out of memory\n");
-            exit(-1);
-        }
-        strcpy(p_name, name);
-        char *p_surname = (char *) malloc((strlen(surname)+1)*sizeof(char));
-        if(p_surname == NULL){
-            printf("ERROR out of memory\n");
-            exit(-1);
-        }
-        strcpy(p_surname, surname);
-        addToList(p_destination, p_name, p_surname, bestScoreInt);
-        actualChar = fgetc(p_fr);
     }
     fclose(p_fr);
 }
@@ -358,7 +360,7 @@ void bubbleSortListByName(LIST *p_list){
 
 // sorts list by surnames
 void bubbleSortListBySurname(LIST *p_list){
-    if(p_list != NULL){
+    if(p_list->p_first != NULL){
         bool swapped = true;
         NODE *p_nodeBefore=NULL;
         NODE *p_node1 = p_list->p_first;
