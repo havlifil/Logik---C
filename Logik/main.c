@@ -19,6 +19,7 @@ void setNewUser(LIST *p_list, uint16_t bestScore){
     addToList(p_list, p_name, p_surname, bestScore);
 }
 
+// functions declaration
 uint16_t screenGame();
 int screenHome();
 void screenScoreboard(LIST *p_list);
@@ -26,7 +27,7 @@ void screenTournament();
 
 int main()
 {
-    LIST *p_userList = createList();
+    LIST *p_userList = generateRandomList(10);//createList();
     loadList(p_userList);
     ShowWindow(GetConsoleWindow(),SW_MAXIMIZE);
     int actualScreen = -1;
@@ -39,8 +40,10 @@ int main()
             break;
         case SCREEN_GAME:
             bestScore = screenGame();
-            clrscr();
-            setNewUser(p_userList, bestScore);
+            if(bestScore != 0){
+                clrscr();
+                setNewUser(p_userList, bestScore);
+            }
             actualScreen = SCREEN_HOME;
             break;
         case SCREEN_SCOREBOARD:
@@ -63,59 +66,81 @@ int main()
     return 0;
 }
 
+// show main menu
 int screenHome(){
-    int width = getCommandLineWidth();
-    int height = getCommandLineHeight();
-    int menuIndex = 0;
-    bool menuInProgress = true;
-    bool change = true;
-    char pressedKey;
+    // SETUP
+    int menuIndex = 0; // index of menu item
+    bool menuInProgress = true; // if true, the menu screen is still running
+    bool change = true; // if true, print screen
+    int oldSize[2]; // console size before last change
+    int actualSize[2]; // actual console size
+    // set old console size to actual values
+    oldSize[0] = getCommandLineWidth();
+    oldSize[1] = getCommandLineHeight();
     clrscr();
+    // LOOP
     while(menuInProgress){
+        // set actual size to actual values
+        actualSize[0] = getCommandLineWidth();
+        actualSize[1] = getCommandLineHeight();
+        // if console size has changed, print screen
+        if(actualSize[0] != oldSize[0]||actualSize[1] != oldSize[1]){
+            oldSize[0] = actualSize[0];
+            oldSize[1] = actualSize[1];
+            clrscr();
+            change = true;
+        }
+        // print screen
         if(change==true){
-            gotoxy(width/2-10,height/2-9);
+            // print MENU item
+            gotoxy(actualSize[0]/2-10,actualSize[1]/2-9);
             printf("MENU");
-            drawRect(width/2-10,height/2-8,10,5,COLOR_WHITE);
+            drawRect(actualSize[0]/2-10,actualSize[1]/2-8,10,5,COLOR_WHITE);
             if(menuIndex == 0){
-                drawRect(width/2-9,height/2-7,9,3,10);
+                drawRect(actualSize[0]/2-9,actualSize[1]/2-7,9,3,COLOR_LIGHTGREEN);
             } else {
-                drawRect(width/2-9,height/2-7,9,3,COLOR_BLACK);
+                drawRect(actualSize[0]/2-9,actualSize[1]/2-7,9,3,COLOR_BLACK);
             }
-            gotoxy(width/2-6,height/2-6);
-            textbackground(0);
+            // print PLAY item
+            gotoxy(actualSize[0]/2-6,actualSize[1]/2-6);
+            textbackground(COLOR_BLACK);
             printf("PLAY");
-            drawRect(width/2-10,height/2-4,10,5,COLOR_WHITE);
+            drawRect(actualSize[0]/2-10,actualSize[1]/2-4,10,5,COLOR_WHITE);
             if(menuIndex == 1){
-                drawRect(width/2-9,height/2-3,9,3,10);
+                drawRect(actualSize[0]/2-9,actualSize[1]/2-3,9,3,COLOR_LIGHTGREEN);
             } else {
-                drawRect(width/2-9,height/2-3,9,3,COLOR_BLACK);
+                drawRect(actualSize[0]/2-9,actualSize[1]/2-3,9,3,COLOR_BLACK);
             }
-            gotoxy(width/2-6,height/2-2);
-            textbackground(0);
-            printf("PLAYERS");
-            drawRect(width/2-10,height/2,10,5,COLOR_WHITE);
+            // print SCOREBOARD item
+            gotoxy(actualSize[0]/2-6,actualSize[1]/2-2);
+            textbackground(COLOR_BLACK);
+            printf("SCOREBOARD");
+            drawRect(actualSize[0]/2-10,actualSize[1]/2,10,5,COLOR_WHITE);
             if(menuIndex == 2){
-                drawRect(width/2-9,height/2+1,9,3,10);
+                drawRect(actualSize[0]/2-9,actualSize[1]/2+1,9,3,COLOR_LIGHTGREEN);
             } else {
-                drawRect(width/2-9,height/2+1,9,3,COLOR_BLACK);
+                drawRect(actualSize[0]/2-9,actualSize[1]/2+1,9,3,COLOR_BLACK);
             }
-            gotoxy(width/2-6,height/2+2);
-            textbackground(0);
+            // print TOURNAMENT item
+            gotoxy(actualSize[0]/2-6,actualSize[1]/2+2);
+            textbackground(COLOR_BLACK);
             printf("TOURNAMENT");
-            drawRect(width/2-10,height/2+4,10,5,COLOR_WHITE);
+            drawRect(actualSize[0]/2-10,actualSize[1]/2+4,10,5,COLOR_WHITE);
             if(menuIndex == 3){
-                drawRect(width/2-9,height/2+5,9,3,10);
+                drawRect(actualSize[0]/2-9,actualSize[1]/2+5,9,3,COLOR_LIGHTGREEN);
             } else {
-                drawRect(width/2-9,height/2+5,9,3,COLOR_BLACK);
+                drawRect(actualSize[0]/2-9,actualSize[1]/2+5,9,3,COLOR_BLACK);
             }
-            gotoxy(width/2-6,height/2+6);
-            textbackground(0);
+            // print SAVE & QUIT item
+            gotoxy(actualSize[0]/2-6,actualSize[1]/2+6);
+            textbackground(COLOR_BLACK);
             printf("SAVE & QUIT");
             setDefaultGraphics();
             change = false;
         }
+        // user control
         if(kbhit()){
-            pressedKey = getch();
+            int pressedKey = getch(); // get pressed key
             switch(pressedKey){
             case 'w':
                 menuIndex--;
@@ -139,42 +164,65 @@ int screenHome(){
     }
 }
 
+// start game
 uint16_t screenGame(){
-    clrscr();
+    // SETUP
     // generating random right combination
     char rightCombination[COMBINATION_SIZE];
     generateCombination(rightCombination, COMBINATION_SIZE);
     // generating blank combination for users guesses
     char actualCombination[COMBINATION_SIZE];
     generateBlankCombination(actualCombination, COMBINATION_SIZE);
-    INFORMATIVE_PINS informativePins; // structure with information about success of users guess
+    // structure with information about success of users guess
+    INFORMATIVE_PINS informativePins;
     informativePins.guessedColors = 0;
     informativePins.guessedColorsInPositions = 0;
-    bool gameInProgress = true;
-    bool change = true; // true if any graphics changes
-    char pressedKey; // stores pressed key
-    int pinIndex = 0; // index of pin which is user editing
-    int numAttemps = 0;
-    char **p_attempHistory = NULL;
-    drawRect(69,1,25,100,3);
+    bool gameInProgress = true; // if true, the game screen is still running
+    bool change = true; // if true, print screen
+    int pinIndex = 0; // index of selected pin
+    int numAttempts = 0; // number of attempts
+    char **p_attemptHistory = NULL; // history of all attempts
+    int oldSize[2]; // console size before last change
+    int actualSize[2]; // actual console size
+    // set old console size to actual values
+    oldSize[0] = getCommandLineWidth();
+    oldSize[1] = getCommandLineHeight();
+    clrscr();
+    // LOOP
     while(gameInProgress){
+        // set actual size to actual values
+        actualSize[0] = getCommandLineWidth();
+        actualSize[1] = getCommandLineHeight();
+        // if console size has changed, print screen
+        if(actualSize[0] != oldSize[0]||actualSize[1] != oldSize[1]){
+            oldSize[0] = actualSize[0];
+            oldSize[1] = actualSize[1];
+            clrscr();
+            change = true;
+        }
+        // print screen
         if(change == true){
-            drawRect(1,1,25,8,3);
-            drawRect((pinIndex*10)+1,1,5,6,10);
-            drawCombination(2,2,actualCombination,COMBINATION_SIZE);
-            for(int i = numAttemps-1; i>-1; i--){
-                INFORMATIVE_PINS informativePins = checkCombination(rightCombination, p_attempHistory[i], COMBINATION_SIZE);
-                drawCombinationSmall(70, ((numAttemps-1)*5+2)-(i*5), p_attempHistory[i], informativePins, COMBINATION_SIZE);
+            // draw combination
+            drawRect(actualSize[0]/2-52,1,26,8,COLOR_CYAN);// draw background rect
+            drawRect((actualSize[0]/2-52)+(pinIndex*10)+1,2,5,6,COLOR_LIGHTGREEN);// draw bounding rect
+            drawCombination(actualSize[0]/2-50,3,actualCombination,COMBINATION_SIZE);// draw combination
+            // drew attempt history
+            for(int i = numAttempts-1; i>-1; i--){
+                INFORMATIVE_PINS informativePins = checkCombination(rightCombination, p_attemptHistory[i], COMBINATION_SIZE);
+                drawRect(actualSize[0]/2+1,((numAttempts-1)*5+1)-(i*5),14,6,COLOR_CYAN);
+                drawCombinationSmall(actualSize[0]/2+3, ((numAttempts-1)*5+2)-(i*5), p_attemptHistory[i], informativePins, COMBINATION_SIZE);
             }
-            gotoxy(52,1);
-            textbackground(0);
-            printf("ATTEMPS: %d", numAttemps);
-            gotoxy(1,20);
+            gotoxy(actualSize[0]/2-52,9);
+            textbackground(COLOR_BLACK);
+            printf("Attempt: %d", numAttempts);
+            gotoxy(1,1);
             printCombination(rightCombination, COMBINATION_SIZE);
+            setDefaultGraphics();
             change = false;
         }
+        // user control
         if(kbhit()){
-            pressedKey = getch();
+            char pressedKey = getch();
             switch(pressedKey){
             case 'w':
                 actualCombination[pinIndex]++;
@@ -205,44 +253,71 @@ uint16_t screenGame(){
             case '\r':
                 if(combinationIsValid(actualCombination, COMBINATION_SIZE)){
                     informativePins = checkCombination(rightCombination, actualCombination, COMBINATION_SIZE);
+                    // if combination right, end game
                     if(informativePins.guessedColorsInPositions == 5){
                         gameInProgress = false;
                     }
-                    numAttemps++;
-                    if(p_attempHistory == NULL){
-                        p_attempHistory = (char **)malloc(sizeof(char *));
+                    numAttempts++;
+                    // add item to attempt history
+                    if(p_attemptHistory == NULL){
+                        p_attemptHistory = (char **)malloc(sizeof(char *));
                     } else {
-                        p_attempHistory = (char **)realloc(p_attempHistory, numAttemps*sizeof(char *));
+                        p_attemptHistory = (char **)realloc(p_attemptHistory, numAttempts*sizeof(char *));
                     }
-                    if(p_attempHistory == NULL){
+                    if(p_attemptHistory == NULL){
                         printf("ERROR out of memory\n");
                         exit(-1);
                     }
-                    p_attempHistory[numAttemps-1] = (char *) malloc(COMBINATION_SIZE*sizeof(char *));
-                    if(p_attempHistory[numAttemps-1] == NULL){
+                    p_attemptHistory[numAttempts-1] = (char *) malloc(COMBINATION_SIZE*sizeof(char *));
+                    if(p_attemptHistory[numAttempts-1] == NULL){
                         printf("ERROR out of memory\n");
                         exit(-1);
                     }
                     for(int i = 0; i<COMBINATION_SIZE; i++){
-                        *(p_attempHistory[numAttemps-1]+i) = actualCombination[i];
+                        *(p_attemptHistory[numAttempts-1]+i) = actualCombination[i];
                     }
                     change = true;
                 }
                 break;
+            case 27:
+                return 0;
+                break;
             }
         }
     }
-    for(int i = 0; i<numAttemps; i++){
-        free(p_attempHistory[i]);
+    // free allocated memory
+    for(int i = 0; i<numAttempts; i++){
+        free(p_attemptHistory[i]);
     }
-    free(p_attempHistory);
-    return numAttemps;
+    free(p_attemptHistory);
+    return numAttempts;
 }
 
+// show scoreboard
 void screenScoreboard(LIST *p_list){
-    printScoreboard(p_list);
     bool scoreboardInProgress = true;
+    bool change = true;
+    int oldSize[2]; // console size before last change
+    int actualSize[2]; // actual console size
+    // set old console size to actual values
+    oldSize[0] = getCommandLineWidth();
+    oldSize[1] = getCommandLineHeight();
+    clrscr();
     while(scoreboardInProgress){
+        // set actual size to actual values
+        actualSize[0] = getCommandLineWidth();
+        actualSize[1] = getCommandLineHeight();
+        // if console size has changed, print screen
+        if(actualSize[0] != oldSize[0]||actualSize[1] != oldSize[1]){
+            oldSize[0] = actualSize[0];
+            oldSize[1] = actualSize[1];
+            clrscr();
+            change = true;
+        }
+        if(change == true){
+            printScoreboard(p_list);
+            change = false;
+        }
         if(kbhit()){
             char pressedKey = getch();
             if(pressedKey == 27){
@@ -252,9 +327,16 @@ void screenScoreboard(LIST *p_list){
     }
 }
 
+// start tournament
 void screenTournament(){
     uint16_t score1 = screenGame();
+    if(score1 == 0){
+        return;
+    }
     uint16_t score2 = screenGame();
+    if(score2 == 0){
+        return;
+    }
     clrscr();
     if(score1==score2){
         printf("Draw");

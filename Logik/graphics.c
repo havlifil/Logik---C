@@ -136,25 +136,45 @@ void drawCombinationSmall(int x, int y, char *p_combination, INFORMATIVE_PINS in
 // SCREEN SCOREBOARD
 
 void printScoreboard(LIST *p_list){
+    setDefaultGraphics();
     bubbleSortListByID(p_list);
     NODE *p_actual = p_list->p_first;
-    printf("By ID:\n");
+    drawRect(1, 1, 29, 3, COLOR_WHITE);
+    textbackground(COLOR_BLACK);
+    textcolor(COLOR_WHITE);
+    gotoxy(2, 2);
+    printf("ID   ");
+    gotoxy(8, 2);
+    printf("NAME               ");
+    gotoxy(28, 2);
+    printf("SURNAME            ");
+    gotoxy(48, 2);
+    printf("BESTSCORE");
+    int row = 1;
     while(p_actual != NULL){
-        printf("ID: %d NAME: %s SURNAME: %s BESTSCORE: %d\n", p_actual->ID, p_actual->p_name, p_actual->p_surname, p_actual->bestScore);
+        gotoxy(2, (row*2)+2);
+        printf("%d", p_actual->ID);
+        gotoxy(8, (row*2)+2);
+        printf("%s", p_actual->p_name);
+        gotoxy(28, (row*2)+2);
+        printf("%s", p_actual->p_surname);
+        gotoxy(48, (row*2)+2);
+        printf("%d", p_actual->bestScore);
         p_actual = p_actual->p_next;
+        row++;
     }
-    bubbleSortListByName(p_list);
+    /*bubbleSortListByName(p_list);
     p_actual = p_list->p_first;
-    printf("By name:\n");
+    //printf("By name:\n");
     while(p_actual != NULL){
         printf("ID: %d NAME: %s SURNAME: %s BESTSCORE: %d\n", p_actual->ID, p_actual->p_name, p_actual->p_surname, p_actual->bestScore);
         p_actual = p_actual->p_next;
     }
     bubbleSortListBySurname(p_list);
     p_actual = p_list->p_first;
-    printf("By surname:\n");
+    //printf("By surname:\n");
     while(p_actual != NULL){
         printf("ID: %d NAME: %s SURNAME: %s BESTSCORE: %d\n", p_actual->ID, p_actual->p_name, p_actual->p_surname, p_actual->bestScore);
         p_actual = p_actual->p_next;
-    }
+    }*/
 }
