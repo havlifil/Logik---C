@@ -1,3 +1,11 @@
+/*
+ * File: constants.h
+ * Author: Filip Havlík
+ * Last Modified: 27. 5. 2023
+ * Description: Header file containing constants for the game Logik.
+ * Contact: havlifil@gmail.com
+ */
+
 #ifndef CONSTANTS_H_INCLUDED
 #define CONSTANTS_H_INCLUDED
 
@@ -38,6 +46,7 @@
 #define SCREEN_GAME 0
 #define SCREEN_SCOREBOARD 1
 #define SCREEN_TOURNAMENT 2
-#define SCREEN_QUIT 3
+#define SCREEN_RULES 3
+#define SCREEN_QUIT 4
 
 #endif // CONSTANTS_H_INCLUDED

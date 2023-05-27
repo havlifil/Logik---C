@@ -1,3 +1,12 @@
+/*
+ * File: linkedList.h
+ * Author: Filip Havlík
+ * Last Modified: 27. 5. 2023
+ * Description: Header file containing function declaration for linkedList.c.
+ * Contact: havlifil@gmail.com
+ */
+
+
 #include <stdint.h>
 
 #ifndef LINKEDLIST_H_INCLUDED
@@ -26,9 +35,13 @@ extern void saveList(LIST *p_list);
 extern void *loadList();
 extern bool validateString(char *p_string);
 extern char *getNameSurname();
+extern void setNewUser(LIST *p_list, uint16_t bestScore);
 extern void toLower(char *p_string);
 extern void swapNodes(LIST *p_list, NODE *p_nodeBefore, NODE *p_node1, NODE *p_node2);
 extern void bubbleSortListByID(LIST *p_list);
+extern void bubbleSortListByScore(LIST *p_list);
 extern void bubbleSortListByName(LIST *p_list);
+extern void bubbleSortListBySurname(LIST *p_list);
+extern void logScoreboard(LIST *p_list);
 
 #endif // LINKEDLIST_H_INCLUDED

@@ -1,8 +1,17 @@
+/*
+ * File: linkedList.c
+ * Author: Filip Havlík
+ * Last Modified: 27. 5. 2023
+ * Description: Source file containing functions for working with strings, linked lists, and saving data to files.
+ * Contact: havlifil@gmail.com
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <windows.h>
 
 #include "constants.h"
 
@@ -24,7 +33,7 @@ typedef struct {
     NODE *p_last; // address of the last node
 } LIST;
 
-// creates new list
+// create new list
 LIST *createList(){
     LIST *p_list = (LIST *) malloc(sizeof(LIST));
     if(p_list == NULL){
@@ -37,7 +46,7 @@ LIST *createList(){
     return p_list;
 }
 
-// frees whole list
+// free whole list
 void freeList(LIST *p_list){
     NODE *p_actualNode = p_list->p_first; // creates buffer node for actual node and set it to first node
     NODE *p_oldNode; // creates second buffer node for old node (node to free)
@@ -52,7 +61,7 @@ void freeList(LIST *p_list){
     free(p_list); // frees list
 }
 
-// adds one node (element) to the end of the list
+// add one node (element) to the end of the list
 NODE *addToList(LIST *p_list, char *p_name, char *p_surname, uint16_t bestScore){
     NODE *p_newNode;
     p_newNode = (NODE *) malloc(sizeof(NODE));
@@ -77,7 +86,7 @@ NODE *addToList(LIST *p_list, char *p_name, char *p_surname, uint16_t bestScore)
     return p_newNode;
 }
 
-// prints whole list
+// print whole list (debug)
 void printList(LIST *p_list){
     NODE *p_actual = p_list->p_first;
     if(p_actual == NULL){
@@ -93,7 +102,7 @@ void printList(LIST *p_list){
     }
 }
 
-// generating random list
+// generate random list (debug)
 LIST *generateRandomList(int numNodes){
     srand(time(0));
     LIST *p_randomList = createList();
@@ -143,10 +152,14 @@ LIST *generateRandomList(int numNodes){
     return p_randomList;
 }
 
-// saves list to file
+// save list to file
 void saveList(LIST *p_list){
     bubbleSortListByID(p_list);
     FILE *p_fw = fopen("logik.dat", "w");
+    if(p_fw == NULL){
+        printf("ERROR cannot open file");
+        exit(-3);
+    }
     NODE *p_actual = p_list->p_first;
     while(p_actual != NULL){
         fputs(p_actual->p_name, p_fw);
@@ -160,7 +173,7 @@ void saveList(LIST *p_list){
     fclose(p_fw);
 }
 
-// loads list from file
+// load list from file
 void *loadList(LIST *p_destination){
     FILE *p_fr = fopen("logik.dat", "r");
     if(p_fr != NULL) {
@@ -214,11 +227,12 @@ void *loadList(LIST *p_destination){
     fclose(p_fr);
 }
 
+
 /*---------*/
 /* STRINGS */
 /*---------*/
 
-// checks if string is valid
+// check if string is valid
 bool validateString(char *p_string){
     if(strlen(p_string)>NAMESURNAME_LENGTH){
         return false;
@@ -235,7 +249,7 @@ bool validateString(char *p_string){
     return true;
 }
 
-// gets string from user properly
+// get string from user properly
 char *getNameSurname(){
     bool valid = false;
     char buffer[1024];
@@ -260,7 +274,17 @@ char *getNameSurname(){
     return p_newString;
 }
 
-// converts all letters to lower
+// set user (debug)
+void setNewUser(LIST *p_list, uint16_t bestScore){
+    int size[2];
+    printf("Name: ");
+    char *p_name = getNameSurname();
+    printf("Surname: ");
+    char *p_surname = getNameSurname();
+    addToList(p_list, p_name, p_surname, bestScore);
+}
+
+// convert all letters to lower
 void toLower(char *p_string){
     for(int i = 0; p_string[i]!='\0'; i++){
         if(((int)*(p_string+i)>64)&&((int)*(p_string+i)<91)){
@@ -273,7 +297,7 @@ void toLower(char *p_string){
 /* SORTING ALGORITHMS */
 /*--------------------*/
 
-// swaps two neighbouring nodes
+// swap two neighbouring nodes
 void swapNodes(LIST *p_list, NODE *p_nodeBefore, NODE *p_node1, NODE *p_node2){
     NODE *p_holder;
     if(p_node1 == p_list->p_first && p_node2 == p_list->p_last){
@@ -301,7 +325,7 @@ void swapNodes(LIST *p_list, NODE *p_nodeBefore, NODE *p_node1, NODE *p_node2){
     }
 }
 
-// sorts list by ID using bubbleSort
+// sort list by ID using bubbleSort
 void bubbleSortListByID(LIST *p_list){
     if(p_list->p_first != NULL){
         bool swapped = true;
@@ -327,7 +351,34 @@ void bubbleSortListByID(LIST *p_list){
     }
 }
 
-// sorts list by names
+// sort list by score using bubbleSort
+void bubbleSortListByScore(LIST *p_list){
+    bubbleSortListByID(p_list);
+    if(p_list->p_first != NULL){
+        bool swapped = true;
+        NODE *p_nodeBefore=NULL;
+        NODE *p_node1 = p_list->p_first;
+        NODE *p_node2 = p_list->p_first->p_next;
+        int j = p_list->numNodes-1;
+        while(swapped==true){
+            swapped = false;
+            while(p_node2 != NULL){
+                if(p_node1->bestScore>p_node2->bestScore){
+                    swapNodes(p_list, p_nodeBefore, p_node1, p_node2);
+                    swapped = true;
+                }
+                p_nodeBefore = p_node1;
+                p_node1 = p_node2;
+                p_node2 = p_node2->p_next;
+            }
+            p_node1 = p_list->p_first;
+            p_node2 = p_list->p_first->p_next;
+            j--;
+        }
+    }
+}
+
+// sort list by names
 void bubbleSortListByName(LIST *p_list){
     if(p_list->p_first != NULL){
         bool swapped = true;
@@ -358,7 +409,7 @@ void bubbleSortListByName(LIST *p_list){
     }
 }
 
-// sorts list by surnames
+// sort list by surnames
 void bubbleSortListBySurname(LIST *p_list){
     if(p_list->p_first != NULL){
         bool swapped = true;
@@ -389,12 +440,25 @@ void bubbleSortListBySurname(LIST *p_list){
     }
 }
 
+/*-----*/
+/* LOG */
+/*-----*/
 
-
-
-
-
-
-
-
-
+// save scoreboard info to .log file
+void logScoreboard(LIST *p_list){
+    FILE *p_fa = fopen("logik.log", "a");
+    if(p_fa == NULL){
+        printf("ERROR cannot open file");
+        exit(-3);
+    }
+    SYSTEMTIME currentTime;
+    GetLocalTime(&currentTime);
+    fprintf(p_fa, "%04d-%02d-%02d %02d:%02d:%02d\n", currentTime.wYear, currentTime.wMonth, currentTime.wDay, currentTime.wHour, currentTime.wMinute, currentTime.wSecond);
+    bubbleSortListByID(p_list);
+    NODE *p_actual = p_list->p_first;
+    while(p_actual != NULL){
+        fprintf(p_fa, "%d|%s|%s|%d\n", p_actual->ID, p_actual->p_name, p_actual->p_surname, p_actual->bestScore);
+        p_actual = p_actual->p_next;
+    }
+    fclose(p_fa);
+}

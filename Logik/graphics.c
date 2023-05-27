@@ -1,3 +1,11 @@
+/*
+ * File: graphics.c
+ * Author: Filip Havlík
+ * Last Modified: 27. 5. 2023
+ * Description: Source file containing graphics for the game Logik.
+ * Contact: havlifil@gmail.com
+ */
+
 #include <stdint.h>
 #include <stdio.h>
 #include <windows.h>
@@ -7,7 +15,7 @@
 #include "linkedList.h"
 #include "constants.h"
 
-// gets command line width
+// get command line width
 int getCommandLineWidth() {
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     int columns;
@@ -16,7 +24,7 @@ int getCommandLineWidth() {
     return columns;
 }
 
-// gets command line height
+// get command line height
 int getCommandLineHeight() {
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     int rows;
@@ -25,14 +33,14 @@ int getCommandLineHeight() {
     return rows;
 }
 
-// sets all colors to default and places cursor to 1,1
+// set all colors to default and places cursor to 1,1
 void setDefaultGraphics(){
     textbackground(0);
     textcolor(15);
     gotoxy(1,1);
 }
 
-// draws rectangle from x, y with current width and height
+// draw rectangle from x, y with current width and height
 void drawRect(int x, int y, int width, int height, uint8_t color){
     textbackground(color);
     for(int i = 0; i<height; i++){
@@ -49,7 +57,7 @@ void drawRect(int x, int y, int width, int height, uint8_t color){
 
 // SCREEN GAME
 
-// draws combination
+// draw combination
 void drawCombination(int x, int y, char *p_combination, int combinationSize){
     uint8_t color;
     for(int i = 0; i<combinationSize; i++){
@@ -86,7 +94,7 @@ void drawCombination(int x, int y, char *p_combination, int combinationSize){
     }
 }
 
-// draws smaller combination with including informative pins
+// draw smaller combination with including informative pins
 void drawCombinationSmall(int x, int y, char *p_combination, INFORMATIVE_PINS informativePins, int combinationSize){
     uint8_t color;
     for(int i = 0; i<combinationSize; i++){
@@ -135,21 +143,51 @@ void drawCombinationSmall(int x, int y, char *p_combination, INFORMATIVE_PINS in
 
 // SCREEN SCOREBOARD
 
-void printScoreboard(LIST *p_list){
+// print sorted scoreboard
+void printScoreboard(LIST *p_list, int sortType){
     setDefaultGraphics();
-    bubbleSortListByID(p_list);
+    switch(sortType){
+    case 0:
+        bubbleSortListByID(p_list);
+        break;
+    case 1:
+        bubbleSortListByName(p_list);
+        break;
+    case 2:
+        bubbleSortListBySurname(p_list);
+        break;
+    case 3:
+        bubbleSortListByScore(p_list);
+        break;
+    }
     NODE *p_actual = p_list->p_first;
     drawRect(1, 1, 29, 3, COLOR_WHITE);
     textbackground(COLOR_BLACK);
-    textcolor(COLOR_WHITE);
+    if(sortType == 0){
+        textbackground(COLOR_LIGHTGREEN);
+    } else
+        textbackground(COLOR_BLACK);
     gotoxy(2, 2);
     printf("ID   ");
+    if(sortType == 1){
+        textbackground(COLOR_LIGHTGREEN);
+    } else
+        textbackground(COLOR_BLACK);
     gotoxy(8, 2);
     printf("NAME               ");
+    if(sortType == 2){
+        textbackground(COLOR_LIGHTGREEN);
+    } else
+        textbackground(COLOR_BLACK);
     gotoxy(28, 2);
     printf("SURNAME            ");
+    if(sortType == 3){
+        textbackground(COLOR_LIGHTGREEN);
+    } else
+        textbackground(COLOR_BLACK);
     gotoxy(48, 2);
     printf("BESTSCORE");
+    setDefaultGraphics();
     int row = 1;
     while(p_actual != NULL){
         gotoxy(2, (row*2)+2);
@@ -163,18 +201,161 @@ void printScoreboard(LIST *p_list){
         p_actual = p_actual->p_next;
         row++;
     }
-    /*bubbleSortListByName(p_list);
-    p_actual = p_list->p_first;
-    //printf("By name:\n");
-    while(p_actual != NULL){
-        printf("ID: %d NAME: %s SURNAME: %s BESTSCORE: %d\n", p_actual->ID, p_actual->p_name, p_actual->p_surname, p_actual->bestScore);
-        p_actual = p_actual->p_next;
+}
+
+// print YOU WON
+void youWon(){
+    int size[2];
+    bool youWonInProgress = true;
+    size[0] = getCommandLineWidth();
+    size[1] = getCommandLineHeight();
+    clrscr();
+    gotoxy(size[0]/2-8, size[1]/2-6);
+    printf("X   X XXXXX X   X");
+    gotoxy(size[0]/2-8, size[1]/2-5);
+    printf(" X X  X   X X   X");
+    gotoxy(size[0]/2-8, size[1]/2-4);
+    printf("  X   X   X X   X");
+    gotoxy(size[0]/2-8, size[1]/2-3);
+    printf("  X   X   X X   X");
+    gotoxy(size[0]/2-8, size[1]/2-2);
+    printf("  X   XXXXX XXXXX");
+    gotoxy(size[0]/2-8, size[1]/2);
+    printf("X   X XXXXX XX  X");
+    gotoxy(size[0]/2-8, size[1]/2+1);
+    printf("X   X X   X X X X");
+    gotoxy(size[0]/2-8, size[1]/2+2);
+    printf("X X X X   X X X X");
+    gotoxy(size[0]/2-8, size[1]/2+3);
+    printf(" X X  X   X X X X");
+    gotoxy(size[0]/2-8, size[1]/2+4);
+    printf(" X X  XXXXX X  XX");
+    gotoxy(size[0]/2-12, size[1]/2+6);
+    printf("Press [SPACE] to continue.");
+    while(youWonInProgress){
+        if(kbhit()){
+            int pressedKey = getch(); // get pressed key
+            switch(pressedKey){
+            case 32:
+                youWonInProgress = false;
+                break;
+            }
+        }
     }
-    bubbleSortListBySurname(p_list);
-    p_actual = p_list->p_first;
-    //printf("By surname:\n");
-    while(p_actual != NULL){
-        printf("ID: %d NAME: %s SURNAME: %s BESTSCORE: %d\n", p_actual->ID, p_actual->p_name, p_actual->p_surname, p_actual->bestScore);
-        p_actual = p_actual->p_next;
-    }*/
+}
+
+// print tournament result
+void printTournamentResult(int result){
+    int size[2];
+    bool printTournamentResultInProgress = true;
+    size[0] = getCommandLineWidth();
+    size[1] = getCommandLineHeight();
+    clrscr();
+    switch(result){
+    case 0:
+        gotoxy(size[0]/2-11, size[1]/2-6);
+        printf("XXXX  XXXXX XXXXX X   X");
+        gotoxy(size[0]/2-11, size[1]/2-5);
+        printf("X   X X   X X   X X   X");
+        gotoxy(size[0]/2-11, size[1]/2-4);
+        printf("X   X XXXXX XXXXX X X X");
+        gotoxy(size[0]/2-11, size[1]/2-3);
+        printf("X   X X X   X   X  X X ");
+        gotoxy(size[0]/2-11, size[1]/2-2);
+        printf("XXXX  X  XX X   X  X X ");
+        gotoxy(size[0]/2-12, size[1]/2);
+        printf("Press [SPACE] to continue.");
+        break;
+    case 1:
+        gotoxy(size[0]/2-19, size[1]/2-6);
+        printf("XXXXX X     XXXXX X   X XXXXX XXXXX   X");
+        gotoxy(size[0]/2-19, size[1]/2-5);
+        printf("X   X X     X   X  X X  X     X   X  XX");
+        gotoxy(size[0]/2-19, size[1]/2-4);
+        printf("XXXXX X     XXXXX   X   XXXXX XXXXX X X");
+        gotoxy(size[0]/2-19, size[1]/2-3);
+        printf("X     X     X   X   X   X     X X     X");
+        gotoxy(size[0]/2-19, size[1]/2-2);
+        printf("X     XXXXX X   X   X   XXXXX X  XX   X");
+        gotoxy(size[0]/2-8, size[1]/2);
+        printf("X   X XXXXX XX  X");
+        gotoxy(size[0]/2-8, size[1]/2+1);
+        printf("X   X X   X X X X");
+        gotoxy(size[0]/2-8, size[1]/2+2);
+        printf("X X X X   X X X X");
+        gotoxy(size[0]/2-8, size[1]/2+3);
+        printf(" X X  X   X X X X");
+        gotoxy(size[0]/2-8, size[1]/2+4);
+        printf(" X X  XXXXX X  XX");
+        gotoxy(size[0]/2-12, size[1]/2+6);
+        printf("Press [SPACE] to continue.");
+        break;
+    case 2:
+        gotoxy(size[0]/2-20, size[1]/2-6);
+        printf("XXXXX X     XXXXX X   X XXXXX XXXXX  XXX ");
+        gotoxy(size[0]/2-20, size[1]/2-5);
+        printf("X   X X     X   X  X X  X     X   X X   X");
+        gotoxy(size[0]/2-20, size[1]/2-4);
+        printf("XXXXX X     XXXXX   X   XXXXX XXXXX X   X");
+        gotoxy(size[0]/2-20, size[1]/2-3);
+        printf("X     X     X   X   X   X     X X      X");
+        gotoxy(size[0]/2-20, size[1]/2-2);
+        printf("X     XXXXX X   X   X   XXXXX X  XX XXXXX");
+        gotoxy(size[0]/2-8, size[1]/2);
+        printf("X   X XXXXX XX  X");
+        gotoxy(size[0]/2-8, size[1]/2+1);
+        printf("X   X X   X X X X");
+        gotoxy(size[0]/2-8, size[1]/2+2);
+        printf("X X X X   X X X X");
+        gotoxy(size[0]/2-8, size[1]/2+3);
+        printf(" X X  X   X X X X");
+        gotoxy(size[0]/2-8, size[1]/2+4);
+        printf(" X X  XXXXX X  XX");
+        gotoxy(size[0]/2-12, size[1]/2+6);
+        printf("Press [SPACE] to continue.");
+        break;
+    }
+    while(printTournamentResultInProgress){
+        if(kbhit()){
+            int pressedKey = getch(); // get pressed key
+            switch(pressedKey){
+            case 32:
+                printTournamentResultInProgress = false;
+                break;
+            }
+        }
+    }
+}
+
+// wrap text
+void printWrappedText(const char* text, int lineWidth) {
+    int textLength = strlen(text);
+    int start = 0;
+
+    while (start < textLength) {
+        int end = start + lineWidth;
+
+        if (end >= textLength) {
+            end = textLength;
+        }
+        else {
+            // Find the last space within the line width
+            while (end > start && text[end] != ' ') {
+                end--;
+            }
+
+            // If no space found, move to the next word
+            if (end == start) {
+                end = start + lineWidth;
+            }
+        }
+
+        // Print the line
+        for (int i = start; i < end; i++) {
+            printf("%c", text[i]);
+        }
+        printf("\n");
+
+        start = end + 1;
+    }
 }

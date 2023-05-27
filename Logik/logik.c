@@ -1,3 +1,11 @@
+/*
+ * File: logik.c
+ * Author: Filip Havlík
+ * Last Modified: 27. 5. 2023
+ * Description: Source file containing functions, that are creating basic game logic.
+ * Contact: havlifil@gmail.com
+ */
+
 #include <time.h>
 #include <stdbool.h>
 #include "constants.h"
@@ -7,6 +15,7 @@ typedef struct{
     int guessedColorsInPositions;
 }INFORMATIVE_PINS;
 
+// generate random combination
 void generateCombination(char *p_output, int combinationSize){
     srand(time(0));
     for(int i = 0; i<combinationSize; i++){
@@ -14,6 +23,7 @@ void generateCombination(char *p_output, int combinationSize){
     }
 }
 
+// generate blank combination
 void generateBlankCombination(char *p_output, int combinationSize){
     srand(time(0));
     for(int i = 0; i<combinationSize; i++){
@@ -21,6 +31,7 @@ void generateBlankCombination(char *p_output, int combinationSize){
     }
 }
 
+// check combination validity
 bool combinationIsValid(char *p_combination, int combinationSize){
     for(int i = 0; i<combinationSize; i++){
         if(*(p_combination+i)==PIN_NEUTRAL){
@@ -30,6 +41,7 @@ bool combinationIsValid(char *p_combination, int combinationSize){
     return true;
 }
 
+// check combination correctness
 INFORMATIVE_PINS checkCombination(char *p_rightCombination, char *p_combination, int combinationSize){
     INFORMATIVE_PINS informativePins;
     informativePins.guessedColors = 0;
@@ -62,6 +74,7 @@ INFORMATIVE_PINS checkCombination(char *p_rightCombination, char *p_combination,
     return informativePins;
 }
 
+// print combination as a text (debug)
 void printCombination(char *p_combination, int combinationSize){
     for(int i = 0; i<combinationSize; i++){
         printf("#%d ", i);

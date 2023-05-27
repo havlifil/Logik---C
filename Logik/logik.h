@@ -1,3 +1,11 @@
+/*
+ * File: logik.h
+ * Author: Filip Havlík
+ * Last Modified: 27. 5. 2023
+ * Description: Header file containing function declaration for logik.c.
+ * Contact: havlifil@gmail.com
+ */
+
 #include <stdbool.h>
 
 #ifndef LOGIK_H_INCLUDED
